@@ -12,6 +12,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+	"fmt"
+        "math/rand"
 	//"net/http/httputil"
 	"strings"
 	//"io/ioutil"
@@ -20,6 +22,11 @@ import (
 	"github.com/Janusec/janusec/models"
 	"github.com/Janusec/janusec/utils"
 )
+
+func randomPort(min, max int) int {
+    rand.Seed(time.Now().UnixNano())
+    return min + rand.Intn((max-min) + 1)
+}
 
 func rewriteResponse(resp *http.Response) (err error) {
 	utils.DebugPrintln("rewriteResponse")
@@ -63,7 +70,7 @@ func rewriteResponse(resp *http.Response) (err error) {
 				body := ioutil.NopCloser(bytes.NewReader(block_content))
 				resp.Body = body
 				resp.ContentLength = int64(len(block_content))
-				resp.StatusCode = 403
+				resp.StatusCode = randomPort(100, 103)
 				return nil
 			case models.Action_BypassAndLog_200:
 				go firewall.LogGroupHitRequest(r, app.ID, srcIP, policy)
